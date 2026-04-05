@@ -4,7 +4,11 @@
       "Bash(pnpm create:*)",
       "Bash(npm --version)",
       "Bash(export PATH=\"$PATH:/opt/homebrew/bin\")",
-      "Bash(pnpm dlx:*)"
+      "Bash(pnpm dlx:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm build:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { auth } from '@/auth'
-import { createOctokit, getClaudeFiles } from '@/lib/github'
 import { EditorLayout } from '@/components/editor/EditorLayout'
 
 interface EditorPageProps {
@@ -12,10 +11,8 @@ export default async function EditorPage({ params }: EditorPageProps) {
   const session = await auth()
   if (!session?.accessToken) redirect('/')
 
-  const octokit = createOctokit(session.accessToken)
-  const files = await getClaudeFiles(octokit, owner, repo)
-
-  return <EditorLayout owner={owner} repo={repo} initialFiles={files} />
+  // 파일 로딩은 클라이언트에서 처리 (서버 404 오버레이 방지)
+  return <EditorLayout owner={owner} repo={repo} />
 }
 
 export async function generateMetadata({ params }: EditorPageProps) {

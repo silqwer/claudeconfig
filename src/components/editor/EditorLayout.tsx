@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ChevronRight, GitPullRequest } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Sidebar } from './Sidebar'
 import { FileList } from './FileList'
 import { EditorPanel } from './EditorPanel'
@@ -15,15 +16,27 @@ import type { ClaudeFile } from '@/types'
 interface EditorLayoutProps {
   owner: string
   repo: string
-  initialFiles: ClaudeFile[]
 }
 
-export function EditorLayout({ owner, repo, initialFiles }: EditorLayoutProps) {
+export function EditorLayout({ owner, repo }: EditorLayoutProps) {
   const { initialize, isDirty, openPRModal, dirtyFiles } = useEditorStore()
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    initialize(owner, repo, initialFiles)
-  }, [owner, repo, initialFiles, initialize])
+    const fetchFiles = async () => {
+      setIsLoading(true)
+      try {
+        const res = await fetch(`/api/github/files?owner=${owner}&repo=${repo}`)
+        const files: ClaudeFile[] = res.ok ? await res.json() : []
+        initialize(owner, repo, files)
+      } catch {
+        initialize(owner, repo, [])
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchFiles()
+  }, [owner, repo, initialize])
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -48,12 +61,7 @@ export function EditorLayout({ owner, repo, initialFiles }: EditorLayoutProps) {
                 {dirtyFiles.size}개 변경됨
               </Badge>
             )}
-            <Button
-              onClick={openPRModal}
-              disabled={!isDirty()}
-              size="sm"
-              className="gap-1.5"
-            >
+            <Button onClick={openPRModal} disabled={!isDirty()} size="sm" className="gap-1.5">
               <GitPullRequest className="w-4 h-4" />
               PR 생성
             </Button>
@@ -62,11 +70,25 @@ export function EditorLayout({ owner, repo, initialFiles }: EditorLayoutProps) {
       </header>
 
       {/* Main - 3 column layout */}
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
-        <FileList />
-        <EditorPanel />
-      </div>
+      {isLoading ? (
+        <div className="flex flex-1 overflow-hidden">
+          <div className="w-48 border-r p-2 flex flex-col gap-1">
+            {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
+          </div>
+          <div className="w-64 border-r p-2 flex flex-col gap-1">
+            {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-7 w-full" />)}
+          </div>
+          <div className="flex-1 p-4">
+            <Skeleton className="h-full w-full" />
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-1 overflow-hidden">
+          <Sidebar />
+          <FileList />
+          <EditorPanel />
+        </div>
+      )}
 
       <PRModal />
     </div>
