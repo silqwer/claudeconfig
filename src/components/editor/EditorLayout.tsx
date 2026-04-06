@@ -10,6 +10,7 @@ import { Sidebar } from './Sidebar'
 import { FileList } from './FileList'
 import { EditorPanel } from './EditorPanel'
 import { PRModal } from './PRModal'
+import { ImportModal } from './ImportModal'
 import { useEditorStore } from '@/store/editor'
 import type { ClaudeFile } from '@/types'
 
@@ -91,6 +92,7 @@ export function EditorLayout({ owner, repo }: EditorLayoutProps) {
       )}
 
       <PRModal />
+      <ImportModal />
     </div>
   )
 }

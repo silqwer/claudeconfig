@@ -11,6 +11,7 @@ interface EditorStore {
   owner: string
   repo: string
   isPRModalOpen: boolean
+  isImportModalOpen: boolean
 
   // 액션
   initialize: (owner: string, repo: string, files: ClaudeFile[]) => void
@@ -24,6 +25,8 @@ interface EditorStore {
   getDirtyFiles: () => ClaudeFile[]
   openPRModal: () => void
   closePRModal: () => void
+  openImportModal: () => void
+  closeImportModal: () => void
 }
 
 const initialState = {
@@ -35,6 +38,7 @@ const initialState = {
   owner: '',
   repo: '',
   isPRModalOpen: false,
+  isImportModalOpen: false,
 }
 
 export const useEditorStore = create<EditorStore>()((set, get) => ({
@@ -102,4 +106,6 @@ export const useEditorStore = create<EditorStore>()((set, get) => ({
 
   openPRModal: () => set({ isPRModalOpen: true }),
   closePRModal: () => set({ isPRModalOpen: false }),
+  openImportModal: () => set({ isImportModalOpen: true }),
+  closeImportModal: () => set({ isImportModalOpen: false }),
 }))

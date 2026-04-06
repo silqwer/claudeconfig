@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Trash2, FileText } from 'lucide-react'
+import { Plus, Trash2, FileText, Download } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -18,6 +18,7 @@ export function FileList() {
     dirtyFiles,
     selectFile,
     addFile,
+    openImportModal,
   } = useEditorStore()
 
   const [showNewInput, setShowNewInput] = useState(false)
@@ -62,14 +63,25 @@ export function FileList() {
           파일
         </span>
         {canAddFile && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-6 h-6"
-            onClick={() => setShowNewInput(true)}
-          >
-            <Plus className="w-3.5 h-3.5" />
-          </Button>
+          <div className="flex items-center gap-0.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-6 h-6"
+              onClick={openImportModal}
+              title="Import from repo"
+            >
+              <Download className="w-3.5 h-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="w-6 h-6"
+              onClick={() => setShowNewInput(true)}
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </Button>
+          </div>
         )}
       </div>
 
