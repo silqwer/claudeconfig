@@ -31,10 +31,17 @@ export function FileList() {
     const name = newFileName.trim().endsWith('.md')
       ? newFileName.trim()
       : `${newFileName.trim()}.md`
+
+    const skillName = path.replace(/^.*\//, '').replace(/\.md$/, '')
+    const content =
+      selectedSection === 'skills'
+        ? `---\nname: ${skillName}\ndescription: \n---\n\n`
+        : ''
+
     addFile({
       path,
       name,
-      content: '',
+      content,
       scope:
         selectedSection === 'rules'
           ? 'rules'
@@ -71,14 +78,6 @@ export function FileList() {
           {sectionFiles.length === 0 && !showNewInput && (
             <div className="text-center py-8 text-xs text-muted-foreground px-3">
               파일이 없습니다.
-              {canAddFile && (
-                <button
-                  className="block mt-1 text-primary underline-offset-2 hover:underline"
-                  onClick={() => setShowNewInput(true)}
-                >
-                  새 파일 추가
-                </button>
-              )}
             </div>
           )}
 
@@ -143,15 +142,23 @@ export function FileList() {
 function DeleteFileButton({ filePath }: { filePath: string }) {
   const { markFileDeleted } = useEditorStore()
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={(e) => {
         e.stopPropagation()
         markFileDeleted(filePath)
       }}
-      className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.stopPropagation()
+          markFileDeleted(filePath)
+        }
+      }}
+      className="opacity-0 group-hover:opacity-100 transition-opacity hover:text-destructive cursor-pointer"
       title="파일 삭제"
     >
       <Trash2 className="w-3 h-3" />
-    </button>
+    </div>
   )
 }

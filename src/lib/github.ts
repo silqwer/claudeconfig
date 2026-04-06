@@ -164,15 +164,12 @@ export async function createPR(
 
   for (const file of files) {
     if (file.deleted) {
-      treeItems.push({ path: file.path, mode: '100644', type: 'blob', sha: null })
+      // sha가 없으면 GitHub에 존재하지 않는 파일이므로 트리에서 제외
+      if (file.sha) {
+        treeItems.push({ path: file.path, mode: '100644', type: 'blob', sha: null })
+      }
     } else {
-      const { data: blob } = await octokit.git.createBlob({
-        owner,
-        repo,
-        content: Buffer.from(file.content).toString('base64'),
-        encoding: 'base64',
-      })
-      treeItems.push({ path: file.path, mode: '100644', type: 'blob', sha: blob.sha })
+      treeItems.push({ path: file.path, mode: '100644', type: 'blob', content: file.content })
     }
   }
 
