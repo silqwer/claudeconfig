@@ -1,6 +1,6 @@
 'use client'
 
-import { BookOpen, Wrench, Webhook, PlugZap, Globe } from 'lucide-react'
+import { BookOpen, Wrench, Globe } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Separator } from '@/components/ui/separator'
 import { useEditorStore } from '@/store/editor'
@@ -9,8 +9,6 @@ import type { EditorSection } from '@/types'
 const sections: Array<{ id: EditorSection; label: string; icon: React.ReactNode }> = [
   { id: 'rules', label: 'Rules', icon: <BookOpen className="w-4 h-4" /> },
   { id: 'skills', label: 'Skills', icon: <Wrench className="w-4 h-4" /> },
-  { id: 'hooks', label: 'Hooks', icon: <Webhook className="w-4 h-4" /> },
-  { id: 'connectors', label: 'Connectors', icon: <PlugZap className="w-4 h-4" /> },
 ]
 
 export function Sidebar() {
@@ -20,7 +18,6 @@ export function Sidebar() {
     return files.some((f) => {
       if (section === 'rules') return f.scope === 'repo' || f.scope === 'local' || f.scope === 'rules'
       if (section === 'skills') return f.scope === 'skills'
-      if (section === 'hooks' || section === 'connectors') return f.scope === 'settings'
       return false
     })
   }

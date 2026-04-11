@@ -22,7 +22,7 @@ export interface ClaudeFile {
   isDeleted?: boolean
 }
 
-export type EditorSection = 'rules' | 'skills' | 'hooks' | 'connectors' | 'global'
+export type EditorSection = 'rules' | 'skills' | 'global'
 
 export interface EditorState {
   selectedSection: EditorSection

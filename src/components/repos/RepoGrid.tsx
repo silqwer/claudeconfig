@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Search, Filter } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -18,29 +18,37 @@ export function RepoGrid({ initialRepos }: RepoGridProps) {
   // 클라이언트에서 lazy하게 .claude 배지 체크
   const [claudeMap, setClaudeMap] = useState<Record<string, boolean>>({})
 
-  const checkClaudeConfig = useCallback(async (repos: GitHubRepo[]) => {
-    // 5개씩 배치로 처리 (rate limit 방지)
-    const BATCH = 5
-    for (let i = 0; i < repos.length; i += BATCH) {
-      const batch = repos.slice(i, i + BATCH)
-      await Promise.all(
-        batch.map(async (repo) => {
-          try {
-            const res = await fetch(
-              `/api/github/files?owner=${repo.owner.login}&repo=${repo.name}&checkOnly=true`
-            )
-            setClaudeMap((prev) => ({ ...prev, [repo.full_name]: res.ok }))
-          } catch {
-            setClaudeMap((prev) => ({ ...prev, [repo.full_name]: false }))
-          }
-        })
-      )
-    }
-  }, [])
-
   useEffect(() => {
-    checkClaudeConfig(initialRepos)
-  }, [initialRepos, checkClaudeConfig])
+    const controller = new AbortController()
+    const BATCH = 5
+
+    const run = async () => {
+      for (let i = 0; i < initialRepos.length; i += BATCH) {
+        if (controller.signal.aborted) break
+        const batch = initialRepos.slice(i, i + BATCH)
+        await Promise.all(
+          batch.map(async (repo) => {
+            try {
+              const res = await fetch(
+                `/api/github/files?owner=${repo.owner.login}&repo=${repo.name}&checkOnly=true`,
+                { signal: controller.signal }
+              )
+              if (!controller.signal.aborted) {
+                setClaudeMap((prev) => ({ ...prev, [repo.full_name]: res.ok }))
+              }
+            } catch {
+              if (!controller.signal.aborted) {
+                setClaudeMap((prev) => ({ ...prev, [repo.full_name]: false }))
+              }
+            }
+          })
+        )
+      }
+    }
+
+    run()
+    return () => controller.abort()
+  }, [initialRepos])
 
   const reposWithBadge = useMemo(
     () =>

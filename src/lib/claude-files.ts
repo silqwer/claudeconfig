@@ -15,9 +15,6 @@ export function getSectionFiles(files: ClaudeFile[], section: EditorSection): Cl
       return files.filter((f) => f.scope === 'repo' || f.scope === 'local' || f.scope === 'rules')
     case 'skills':
       return files.filter((f) => f.scope === 'skills')
-    case 'hooks':
-    case 'connectors':
-      return files.filter((f) => f.scope === 'settings')
     case 'global':
       return files.filter((f) => f.scope === 'repo' && f.name === 'CLAUDE.md')
     default:
@@ -26,7 +23,7 @@ export function getSectionFiles(files: ClaudeFile[], section: EditorSection): Cl
 }
 
 export function generateBranchName(
-  type: 'rules' | 'skills' | 'hooks' | 'connectors' | 'mixed' = 'mixed'
+  type: 'rules' | 'skills' | 'mixed' = 'mixed'
 ): string {
   const date = format(new Date(), 'yyMMdd')
   return `claude-config/update-${type}-${date}`
@@ -87,8 +84,6 @@ export function getSectionLabel(section: EditorSection): string {
   const labels: Record<EditorSection, string> = {
     rules: 'Rules',
     skills: 'Skills',
-    hooks: 'Hooks',
-    connectors: 'Connectors',
     global: 'Global Rules',
   }
   return labels[section]
